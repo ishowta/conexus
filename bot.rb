@@ -297,10 +297,10 @@ def handle_user_change(action, voice_channel, user)
   return if text_channel.nil?
 
   if action == :join
-    text_channel.send_message("**#{user.display_name}** joined the voice-channel.")
+    # text_channel.send_message("**#{user.display_name}** joined the voice-channel.")
     text_channel.define_overwrite(user, @text_perms, 0)
   else
-    text_channel.send_message("**#{user.display_name}** left the voice-channel.")
+    # text_channel.send_message("**#{user.display_name}** left the voice-channel.")
     text_channel.define_overwrite(user, 0, 0)
   end
 end
