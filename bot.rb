@@ -270,7 +270,7 @@ def associate(voice_channel)
     puts "Not found... creating..."
     @server_namings[server.id] = default_text_channel_name(voice_channel.name)
     # Creates a matching text-channel called 'voice-channel'
-    text_channel = server.create_channel(@server_namings[server.id], 0)
+    text_channel = server.create_channel(@server_namings[server.id], 0, parent: 711301693442359386)
     text_channel.topic = "Private chat for all in [**#{voice_channel.name}**]."
 
     voice_channel.users.each do |u|
