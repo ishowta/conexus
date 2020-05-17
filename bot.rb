@@ -270,7 +270,10 @@ def associate(voice_channel)
     puts "Not found... creating..."
     @server_namings[server.id] = default_text_channel_name(voice_channel.name)
     # Creates a matching text-channel called 'voice-channel'
-    text_channel = server.create_channel(@server_namings[server.id], 0, parent: 711301693442359386)
+
+    botPerm = Discordrb::Overwrite.new(711293788093415597, allow: @text_perms, deny: 0)
+
+    text_channel = server.create_channel(@server_namings[server.id], 0, permission_overwrites: [botPerm], parent: 711301693442359386)
     text_channel.topic = "Private chat for all in [**#{voice_channel.name}**]."
 
     voice_channel.users.each do |u|
@@ -297,6 +300,7 @@ def handle_user_change(action, voice_channel, user)
   return if text_channel.nil?
 
   if action == :join
+    puts text_channel.id
     # text_channel.send_message("**#{user.display_name}** joined the voice-channel.")
     text_channel.define_overwrite(user, @text_perms, 0)
   else
