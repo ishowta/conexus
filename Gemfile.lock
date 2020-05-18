@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ishowta/discordrb.git
-  revision: bda9cfda32061e84bec204e634088b48c6edcea8
+  revision: 6bbd2c4f94a93d3023e66ba563c732d1b37ad14d
   branch: fix/cache-server-channels
   specs:
     discordrb (3.3.0)
