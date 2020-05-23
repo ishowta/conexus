@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/ishowta/discordrb.git
-  revision: 6bbd2c4f94a93d3023e66ba563c732d1b37ad14d
-  branch: fix/cache-server-channels
+  revision: 0d33e1b302a1a996c925abd25a3f2e3a9249a84c
+  branch: fix/always_overwrite_server_when_guild_created
   specs:
     discordrb (3.3.0)
       discordrb-webhooks (~> 3.3.0)
