@@ -267,6 +267,14 @@ def associate(voice_channel)
   text_channel = server.text_channels.find { |tc| tc.id == @associations[voice_channel.id] }
 
   if text_channel.nil?
+    @server_namings[server.id] = default_text_channel_name(voice_channel.name)
+    text_channel = server.text_channels.find { |tc| tc.name == @server_namings[server.id] }
+    puts "Associated text channeld not found but found same text channel. so connect it."
+    @associations[voice_channel.id] = text_channel.id
+    save_local_files
+  end
+
+  if text_channel.nil?
     puts "Not found... creating..."
     @server_namings[server.id] = default_text_channel_name(voice_channel.name)
     # Creates a matching text-channel called 'voice-channel'
