@@ -171,13 +171,37 @@ def run
     'Renamed channel!'
   end
 
-    @bot.command(:shutdown,
-    descripton: 'Shut me down',
+  @bot.command(:shutdown,
+    description: 'Shut me down',
     permission_level: 3
   ) do |event|
     @bot.send_message(event.channel.id, 'Bot is shutting down. BEEeeewwwwww.......boop.')
     @bot.stop
     exit
+  end
+
+  @bot.command(:show,
+    description: 'Show all link-to channel',
+    permission_level: 0
+  ) do |event|
+    puts "show"
+    @associations.each do |vc, tc|
+      text_channel = event.server.text_channels.find { |stc| stc.id == tc }
+      text_channel.define_overwrite(event.user, @text_perms, 0)
+    end
+    nil
+  end
+
+  @bot.command(:hide,
+    description: 'Show all link-to channel',
+    permission_level: 0
+  ) do |event|
+    puts "hide"
+    @associations.each do |vc, tc|
+      text_channel = event.server.text_channels.find { |stc| stc.id == tc }
+      text_channel.define_overwrite(event.user, 0, @text_perms)
+    end
+    nil
   end
 
   # BOT.invisible
