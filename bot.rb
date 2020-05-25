@@ -185,22 +185,25 @@ def run
     permission_level: 0
   ) do |event|
     @bot.servers.each do |_, server|
-      @associations.each do |vc, tc|
-        text_channel = server.text_channels.find { |stc| stc.id == tc }
-        text_channel.define_overwrite(event.user, @text_perms, 0)
+      @associations.each do |vc_id, tc_id|
+        tc = server.text_channels.find { |tc| tc.id == tc_id }
+        tc.define_overwrite(event.user, @text_perms, 0)
       end
     end
     nil
   end
 
   @bot.command(:hide,
-    description: 'Show all link-to channel',
+    description: 'Hide all link-to channel',
     permission_level: 0
   ) do |event|
     @bot.servers.each do |_, server|
-      @associations.each do |vc, tc|
-        text_channel = server.text_channels.find { |stc| stc.id == tc }
-        text_channel.define_overwrite(event.user, 0, @text_perms)
+      @associations.each do |vc_id, tc_id|
+        tc = server.text_channels.find { |tc| tc.id == tc_id }
+        vc = server.voice_channels.find { |vc| vc.id == vc_id }
+        unless vc.users.find { |user| user.id == event.user.id }
+          tc.define_overwrite(event.user, 0, @text_perms)
+        end
       end
     end
     nil
