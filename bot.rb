@@ -58,7 +58,7 @@ def run
   @bot = Discordrb::Commands::CommandBot.new(
     token: ENV["CONEXUS_TOKEN"],
     client_id: ENV["CONEXUS_CLIENT_ID"],
-    prefix: '!',
+    prefix: '$',
     advanced_functionality: true
   )
 
