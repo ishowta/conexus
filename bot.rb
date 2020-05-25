@@ -184,10 +184,11 @@ def run
     description: 'Show all link-to channel',
     permission_level: 0
   ) do |event|
-    puts "show"
-    @associations.each do |vc, tc|
-      text_channel = event.server.text_channels.find { |stc| stc.id == tc }
-      text_channel.define_overwrite(event.user, @text_perms, 0)
+    @bot.servers.each do |_, server|
+      @associations.each do |vc, tc|
+        text_channel = server.text_channels.find { |stc| stc.id == tc }
+        text_channel.define_overwrite(event.user, @text_perms, 0)
+      end
     end
     nil
   end
@@ -196,10 +197,11 @@ def run
     description: 'Show all link-to channel',
     permission_level: 0
   ) do |event|
-    puts "hide"
-    @associations.each do |vc, tc|
-      text_channel = event.server.text_channels.find { |stc| stc.id == tc }
-      text_channel.define_overwrite(event.user, 0, @text_perms)
+    @bot.servers.each do |_, server|
+      @associations.each do |vc, tc|
+        text_channel = server.text_channels.find { |stc| stc.id == tc }
+        text_channel.define_overwrite(event.user, 0, @text_perms)
+      end
     end
     nil
   end
