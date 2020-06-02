@@ -11,6 +11,7 @@ require 'pry'
 ASSOCIATIONS_FILE = 'local/associations.yaml'.freeze
 SERVER_NAMINGS_FILE = 'local/server_namings.yaml'.freeze
 USER_PERMISSIONS_FILE = 'local/user_permissions.yaml'.freeze
+USER_READ_HISTORY_FILE = 'local/user_read_history.yaml'.freeze
 
 REQUIRED_ENVS = %w[CONEXUS_TOKEN CONEXUS_CLIENT_ID].freeze
 
@@ -209,6 +210,35 @@ def run
     nil
   end
 
+  @bot.command(:show,
+    description: 'Show all link-to channel',
+    permission_level: 0
+  ) do |event|
+    @bot.servers.each do |_, server|
+      @associations.each do |vc_id, tc_id|
+        tc = server.text_channels.find { |tc| tc.id == tc_id }
+        tc.define_overwrite(event.user, @text_perms, 0)
+      end
+    end
+    nil
+  end
+
+  @bot.command(:invisible,
+    description: "Don't show history",
+    permission_level: 0
+  ) do |event|
+    @user_read_history.push event.user.id;
+    nil
+  end
+
+  @bot.command(:visible,
+    description: "Show history",
+    permission_level: 0
+  ) do |event|
+    @user_read_history.delete event.user.id;
+    nil
+  end
+
   # BOT.invisible
   puts "Oauth url: #{@bot.invite_url}+&permissions=8"
 
@@ -230,6 +260,9 @@ def setup_local_files
   FileUtils.touch(USER_PERMISSIONS_FILE)
   @user_permissions = YAML.load_file(USER_PERMISSIONS_FILE) || {}
 
+  FileUtils.touch(USER_READ_HISTORY_FILE)
+  @user_read_history = YAML.load_file(USER_READ_HISTORY_FILE) || []
+
   return
 end
 
@@ -240,10 +273,17 @@ def setup_text_permissions
   @text_perms.can_send_messages = true
 end
 
+def setup_text_permissions_exclude_read_history
+  @text_perms_ex_hist = Discordrb::Permissions.new
+  @text_perms_ex_hist.can_read_messages = true
+  @text_perms_ex_hist.can_send_messages = true
+end
+
 def setup_server(server)
   puts "Setting up [#{server.name}]"
   setup_local_files
   setup_text_permissions
+  setup_text_permissions_exclude_read_history
   puts 'Trimming associations'
   trim_associations
   puts 'Cleaning up after restart'
@@ -299,10 +339,10 @@ def associate(voice_channel)
     @server_namings[server.id] = default_text_channel_name(voice_channel.name)
     text_channel = server.text_channels.find { |tc| tc.name == @server_namings[server.id] }
     unless text_channel.nil?
-    puts "Associated text channeld not found but found same text channel. so connect it."
-    @associations[voice_channel.id] = text_channel.id
-    save_local_files
-  end
+      puts "Associated text channeld not found but found same text channel. so connect it."
+      @associations[voice_channel.id] = text_channel.id
+      save_local_files
+    end
   end
 
   if text_channel.nil?
@@ -341,7 +381,11 @@ def handle_user_change(action, voice_channel, user)
   if action == :join
     puts text_channel.id
     # text_channel.send_message("**#{user.display_name}** joined the voice-channel.")
-    text_channel.define_overwrite(user, @text_perms, 0)
+    if @user_read_history.include?(user.id)
+      text_channel.define_overwrite(user, @text_perms_ex_hist, 0)
+    else
+      text_channel.define_overwrite(user, @text_perms, 0)
+    end
   else
     # text_channel.send_message("**#{user.display_name}** left the voice-channel.")
     text_channel.define_overwrite(user, 0, 0)
@@ -352,6 +396,7 @@ def save_local_files
   File.open(ASSOCIATIONS_FILE, 'w') {|f| f.write @associations.to_yaml }
   File.open(SERVER_NAMINGS_FILE, 'w') {|f| f.write @server_namings.to_yaml }
   File.open(USER_PERMISSIONS_FILE, 'w') { |f| f.write @user_permissions.to_yaml }
+  File.open(USER_READ_HISTORY_FILE, 'w') { |f| f.write @user_read_history.to_yaml }
 end
 
 run
